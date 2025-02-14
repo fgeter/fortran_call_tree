@@ -1,7 +1,7 @@
 # fortran_call_tree
 This project is writen in python and its purposes is to read fortran 90 code and write out a subroutine/function call tree in .dot format.  
 
-To execute the code fctree from the command line:
+To execute the the fctree.py code from the command line:
 
 python fctree.py [starting point in the code] 
 
