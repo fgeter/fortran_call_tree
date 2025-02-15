@@ -80,7 +80,7 @@ def convert_ordered_dict_to_dot(sub, file, dot_string):
             dot_string += key[0] + " -- " + "{"
             for sub in ordered_sub_dict[key]:
                 dot_string += " " + sub + " "
-            dot_string += "}\n"
+            dot_string += "};\n"
     return dot_string
             
 reorder_sub_dict("main", "src/main.f90")
