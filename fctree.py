@@ -26,7 +26,7 @@ for file in glob.iglob(arg):
         while line:
             exe_portion = line.split("!")[0].strip().lower()
             exe_portion_list = re.split(r"\W+", exe_portion.strip())
-            while '' in exe_portion_list:   # This necessary because sometimes there is a trailing '' in list
+            while '' in exe_portion_list:   # This is necessary because sometimes there is a trailing '' in list
                 exe_portion_list.remove('')
             if len(exe_portion_list) > 0:
                 token = line.split()[0].split("(")[0].lower()
