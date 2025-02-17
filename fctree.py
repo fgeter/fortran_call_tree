@@ -7,7 +7,6 @@ import os
 from collections import OrderedDict
 import argparse
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--source", type=str, nargs='?', const=1, default="./src", 
