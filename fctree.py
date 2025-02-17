@@ -27,7 +27,7 @@ def main():
     sub_tokens_end = ["endsubroutine", "end subroutine", "endprogram", "end program"]
     exclude_builtin_subroutines = ["exit", "date_and_time"]
     for file in glob.glob(arg):
-        print("Processing file :",file)
+        # print("Processing file :",file)
         with open(file, errors='ignore') as fp:
             line = fp.readline()
             in_sub = False
@@ -57,7 +57,7 @@ def main():
                     
     with open("sub_dict.txt", "w") as sb:
         for x in subroutine_names.keys():
-            print(x, subroutine_names[x])
+            # print(x, subroutine_names[x])
             sb.write(str(x) + str(subroutine_names[x]) + "\n")
 
 
@@ -74,6 +74,7 @@ def main():
         return
 
     ordered_sub_dict = OrderedDict()
+    unused_subroutines = set()
 
     def reorder_sub_dict(sub,file):
         """ Reorders the subroutines_names to the order in which they are called"""
@@ -98,6 +99,12 @@ def main():
                     dot_string += " " + sub + " "
                 dot_string += "};\n"
         return dot_string
+
+    def get_unused_subroutines():
+        for sub in subroutine_names:
+            if sub not in ordered_sub_dict:
+                unused_subroutines.add(sub)
+        return 
                 
     reorder_sub_dict("main", "./src/main.f90")
 
@@ -111,8 +118,14 @@ def main():
     dot_string = convert_ordered_dict_to_dot("main", "src/main.f90", dot_string)
     dot_string += "}"
     # print(dot_string)
-    # with open("swatplus_call_tree.dot", "w") as wp:
-    #     wp.write(dot_string)
+    with open("swatplus_call_tree.dot", "w") as wp:
+         wp.write(dot_string)
+
+    get_unused_subroutines()
+    with open("unused_subroutines.txt", "w") as up:
+        for sub in unused_subroutines:
+
+            up.write(f"{sub[0]} {sub[1]}\n")
 
 if __name__ == '__main__':
     main()
