@@ -38,11 +38,13 @@ def main():
                     exe_portion_list.remove('')
                 if len(exe_portion_list) > 0:
                     token = line.split()[0].split("(")[0].lower()
+
+                    # Add subroutines names and paths
                     if token in sub_tokens_beg: 
                         in_sub = True
                         sub_name = exe_portion_list[1]
-                        if sub_name.lower() != "date_and_time":
-                            subroutine_names.update({(sub_name,file):[]})
+                        if (sub_name, file) not in subroutine_names:
+                            subroutine_names.update({(sub_name, file):[]})
                     if token in sub_tokens_end: 
                         in_sub = False
                     if in_sub:
@@ -51,13 +53,12 @@ def main():
                             if called_sub not in exclude_builtin_subroutines:
                                 if called_sub not in subroutine_names[(sub_name,file)]:
                                     subroutine_names[(sub_name,file)].append(called_sub)
-
                 line = fp.readline()
                     
-    # with open("sub_dict.txt", "w") as sb:
-    #     for x in subroutine_names.keys():
-    #         print(x, subroutine_names[x])
-    #         sb.write(str(x) + str(subroutine_names[x]) + "\n")
+    with open("sub_dict.txt", "w") as sb:
+        for x in subroutine_names.keys():
+            print(x, subroutine_names[x])
+            sb.write(str(x) + str(subroutine_names[x]) + "\n")
 
 
     # Second part of the code takes the subroutine_names dictionary and
@@ -75,6 +76,7 @@ def main():
     ordered_sub_dict = OrderedDict()
 
     def reorder_sub_dict(sub,file):
+        """ Reorders the subroutines_names to the order in which they are called"""
         sub_names = subroutine_names[(sub, file)]
         ordered_sub_dict.update({(sub,file):sub_names})
         for sub in sub_names:
@@ -83,6 +85,7 @@ def main():
         return
 
     def convert_ordered_dict_to_dot(sub, file, dot_string):
+        """ Converts the reordered subroutine dictionary to .dot file."""
         # advance to the start
         start = False
         for key in ordered_sub_dict.keys(): 
@@ -96,7 +99,7 @@ def main():
                 dot_string += "};\n"
         return dot_string
                 
-    reorder_sub_dict("main", "src/main.f90")
+    reorder_sub_dict("main", "./src/main.f90")
 
     # with open("ordered_dict.txt", "w") as od:
     #     for x in ordered_sub_dict.keys():
@@ -107,9 +110,9 @@ def main():
     dot_string = "graph {\nrankdir=LR\n"
     dot_string = convert_ordered_dict_to_dot("main", "src/main.f90", dot_string)
     dot_string += "}"
-    print(dot_string)
-    with open("swatplus_call_tree.dot", "w") as wp:
-        wp.write(dot_string)
+    # print(dot_string)
+    # with open("swatplus_call_tree.dot", "w") as wp:
+    #     wp.write(dot_string)
 
 if __name__ == '__main__':
     main()
