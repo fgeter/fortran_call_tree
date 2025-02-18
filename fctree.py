@@ -25,7 +25,7 @@ def main():
     module_names = []
     sub_tokens_beg = ["subroutine", "program"]
     sub_tokens_end = ["endsubroutine", "end subroutine", "endprogram", "end program"]
-    exclude_builtin_subroutines = ["exit", "date_and_time"]
+    exclude_builtin_subroutines = ["exit", "date_and_time", "system"]
     for file in glob.glob(arg):
         # print("Processing file :",file)
         with open(file, errors='ignore') as fp:
@@ -37,9 +37,8 @@ def main():
                 while '' in exe_portion_list:   # This is necessary because sometimes there is a trailing '' in list
                     exe_portion_list.remove('')
                 if len(exe_portion_list) > 0:
-                    token = line.split()[0].split("(")[0].lower()
-
                     # Add subroutines names and paths
+                    token = line.split()[0].split("(")[0].lower()
                     if token in sub_tokens_beg: 
                         in_sub = True
                         sub_name = exe_portion_list[1]
@@ -48,8 +47,9 @@ def main():
                     if token in sub_tokens_end: 
                         in_sub = False
                     if in_sub:
-                        if token == "call":
-                            called_sub = exe_portion_list[1].lower()
+                        if "call" in exe_portion_list:
+                            call_index = exe_portion_list.index("call")
+                            called_sub = exe_portion_list[call_index + 1].lower()
                             if called_sub not in exclude_builtin_subroutines:
                                 if called_sub not in subroutine_names[(sub_name,file)]:
                                     subroutine_names[(sub_name,file)].append(called_sub)
@@ -115,7 +115,7 @@ def main():
 
     # Convert the ordered dictionary to .dot file
     dot_string = "graph {\nrankdir=LR\n"
-    dot_string = convert_ordered_dict_to_dot("main", "src/main.f90", dot_string)
+    dot_string = convert_ordered_dict_to_dot("main", "./src/main.f90", dot_string)
     dot_string += "}"
     # print(dot_string)
     with open("swatplus_call_tree.dot", "w") as wp:
