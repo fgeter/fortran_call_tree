@@ -75,6 +75,7 @@ def main():
 
     ordered_sub_dict = OrderedDict()
     unused_subroutines = set()
+    seq_list = []
 
     def reorder_sub_dict(sub,file):
         """ Reorders the subroutines_names to the order in which they are called"""
@@ -100,6 +101,25 @@ def main():
                 dot_string += "};\n"
         return dot_string
 
+    def convert_ordered_dict_to_seq(sub, file, seq_string):
+        """ Converts the reordered subroutine dictionary to .dot file."""
+        # advance to the start
+        # start = False
+        # for key in ordered_sub_dict.keys(): 
+        #     if key != (sub, file) and start is False:
+        #         continue
+        #     else:
+        #         start = True
+        if len(ordered_sub_dict[(sub, file)]) > 0:
+            for sub2 in ordered_sub_dict[(sub, file)]:
+                seq_string += sub + "->" + sub2 + ":\n"
+                print(sub + "->" + sub2 + ":" )
+                sub_file_name = get_sub_file_name(sub2)
+                if (sub2, sub_name) not in seq_list:
+                    seq_list.append((sub2, sub_name))
+                    seq_string = convert_ordered_dict_to_seq(sub2, sub_file_name, seq_string)
+        return seq_string
+
     def get_unused_subroutines():
         for sub in subroutine_names:
             if sub not in ordered_sub_dict:
@@ -121,10 +141,14 @@ def main():
     with open("swatplus_call_tree.dot", "w") as wp:
          wp.write(dot_string)
 
+    seq_string = "title Swatplus Sequence Diagram\n"
+    seq_string = convert_ordered_dict_to_seq("main", "./src/main.f90", seq_string)
+    with open("swatplus_call_tree_seq.txt", "w") as wp:
+         wp.write(seq_string)
+
     get_unused_subroutines()
     with open("unused_subroutines.txt", "w") as up:
         for sub in unused_subroutines:
-
             up.write(f"{sub[0]} {sub[1]}\n")
 
 if __name__ == '__main__':
