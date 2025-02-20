@@ -6,6 +6,7 @@ import glob
 import os
 from collections import OrderedDict
 import argparse
+# import graphviz
 
 def main():
     parser = argparse.ArgumentParser()
@@ -95,7 +96,7 @@ def main():
                 continue
             else:
                 start = True
-                dot_string += key[0] + " -- " + "{"
+                dot_string += key[0] + " -> " + "{"
                 for sub in ordered_sub_dict[key]:
                     dot_string += " " + sub + " "
                 dot_string += "};\n"
@@ -134,12 +135,14 @@ def main():
     #         od.write(str(x) + str(ordered_sub_dict[x]) + "\n")
 
     # Convert the ordered dictionary to .dot file
-    dot_string = "graph {\nrankdir=LR\n"
+    dot_string = "digraph {\nrankdir=LR\n"
     dot_string = convert_ordered_dict_to_dot("main", "./src/main.f90", dot_string)
     dot_string += "}"
     # print(dot_string)
     with open("swatplus_call_tree.dot", "w") as wp:
          wp.write(dot_string)
+    # dot = graphviz.Digraph(comment='Swatplus Call Tree')
+    # dot.render("swatplus_call_tree.dot", "swatplus_call_tree2.jpg")
 
     seq_string = "title Swatplus Sequence Diagram\n"
     seq_string = convert_ordered_dict_to_seq("main", "./src/main.f90", seq_string)
